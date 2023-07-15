@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mydeployment
+  labels:
+    app: nginx-multitool
+  annotations:
+    kubernetes.io/change-cause: "Nginx 1.28"
+spec:
+  replicas: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 85%
+      maxUnavailable: 85%
+  selector:
+    matchLabels:
+      app: nginx-multitool
+  template:
+    metadata:
+      labels:
+        app: nginx-multitool
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.28
+        ports:
+          - containerPort: 80
+      - name: multitool
+        image: wbitt/network-multitool
+        ports:
+          - containerPort: 8080
+        env:
+          - name: HTTP_PORT
+            value: "8080"
+          - name: HTTPS_PORT
+            value: "11443"
